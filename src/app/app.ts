@@ -3,10 +3,11 @@ import { RouterOutlet } from '@angular/router';
 import { Hero } from "./components/hero/hero";
 import { BigDay } from "./components/big-day/big-day";
 import { Galery } from "./components/galery/galery";
+import { EventDetails } from "./components/event-details/event-details";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Hero, BigDay, Galery],
+  imports: [RouterOutlet, Hero, BigDay, Galery, EventDetails],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
