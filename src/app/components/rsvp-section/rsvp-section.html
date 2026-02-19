@@ -1,0 +1,25 @@
+<section class="text-center py-24 bg-[#f6f4ef]">
+
+  <h2 class="text-4xl font-serif mb-4">
+    ¿Nos acompañas?
+  </h2>
+
+  <p class="text-gray-600 mb-8 max-w-xl mx-auto">
+    Tu presencia haría este día aún más especial.
+    Por favor confirma tu asistencia antes del 28 de febrero de 2026.
+  </p>
+
+  <button
+    (click)="openModal()"
+    class="bg-yellow-600 hover:bg-yellow-700 text-white px-8 py-3 rounded-full transition shadow-lg"
+  >
+    💛 Confirmar Asistencia
+  </button>
+
+</section>
+
+<!-- Modal -->
+<app-guest-form-modal
+  *ngIf="isModalOpen"
+  (close)="closeModal()">
+</app-guest-form-modal>

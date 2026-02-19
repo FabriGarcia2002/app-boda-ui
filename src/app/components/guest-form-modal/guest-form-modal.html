@@ -1,0 +1,76 @@
+<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+
+  <div class="bg-white rounded-3xl shadow-xl w-full max-w-md p-8 relative animate-fade-in">
+
+    <!-- Botón cerrar -->
+    <button
+      (click)="onClose()"
+      class="absolute top-4 right-4 text-gray-400 hover:text-black text-2xl transition-colors"
+      aria-label="Cerrar modal"
+    >
+      ✕
+    </button>
+
+    <h2 class="text-3xl font-serif text-center font-semibold mb-6 text-gray-800">
+      Confirma tu Asistencia
+    </h2>
+
+    <form [formGroup]="guestForm" (ngSubmit)="onSubmit()" class="space-y-5">
+
+      <div>
+        <input type="text" formControlName="nombre" placeholder="Nombre"
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition" />
+        <div *ngIf="guestForm.get('nombre')?.touched && guestForm.get('nombre')?.invalid"
+          class="text-red-500 text-sm mt-1">
+          El nombre es obligatorio.
+        </div>
+      </div>
+
+      <div>
+        <input type="text" formControlName="apellido" placeholder="Apellido"
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition" />
+        <div *ngIf="guestForm.get('apellido')?.touched && guestForm.get('apellido')?.invalid"
+          class="text-red-500 text-sm mt-1">
+          El apellido es obligatorio.
+        </div>
+      </div>
+
+      <div>
+        <input type="text" formControlName="telefono" placeholder="Teléfono (8 dígitos)"
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition" />
+        <div *ngIf="guestForm.get('telefono')?.touched && guestForm.get('telefono')?.errors?.['required']"
+          class="text-red-500 text-sm mt-1">
+          El teléfono es obligatorio.
+        </div>
+        <div *ngIf="guestForm.get('telefono')?.touched && guestForm.get('telefono')?.errors?.['pattern']"
+          class="text-red-500 text-sm mt-1">
+          El teléfono debe tener 8 dígitos.
+        </div>
+      </div>
+
+      <div>
+        <select formControlName="relacion"
+          class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 transition">
+          <option value="">Selecciona relación</option>
+          <option *ngFor="let r of relaciones" [value]="r.value">{{ r.label }}</option>
+        </select>
+        <div *ngIf="guestForm.get('relacion')?.touched && guestForm.get('relacion')?.invalid"
+          class="text-red-500 text-sm mt-1">
+          La relación es obligatoria.
+        </div>
+      </div>
+
+      <button type="submit"
+        class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-semibold py-3 rounded-full shadow-md transition-all duration-300">
+        Enviar Confirmación
+      </button>
+
+      <!-- Mensaje enviado -->
+      <div *ngIf="submitted" class="mt-4 text-green-600 text-center font-semibold">
+        ✅ Confirmación enviada correctamente
+      </div>
+
+    </form>
+
+  </div>
+</div>
