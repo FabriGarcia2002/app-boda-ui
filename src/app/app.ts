@@ -5,10 +5,11 @@ import { BigDay } from "./components/big-day/big-day";
 import { Galery } from "./components/galery/galery";
 import { EventDetails } from "./components/event-details/event-details";
 import { Footer } from "./components/footer/footer";
+import { Upload } from "./components/upload/upload";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Hero, BigDay, Galery, EventDetails, Footer],
+  imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

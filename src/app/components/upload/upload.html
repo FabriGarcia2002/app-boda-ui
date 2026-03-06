@@ -1,0 +1,193 @@
+<div class="flex flex-col min-h-screen">
+  <app-wedding-nav></app-wedding-nav>
+
+  <section class="flex-1 flex flex-col items-center justify-center bg-[#f3efe6] px-6 py-16">
+
+    <!-- Encabezado -->
+    <div class="text-center mb-10">
+      <div class="flex justify-center mb-5">
+        <div class="w-16 h-16 flex items-center justify-center rounded-full bg-[#9ca68c]/15 text-3xl shadow-inner">
+          📷
+        </div>
+      </div>
+      <h1 class="font-heading text-4xl md:text-5xl text-foreground mb-3">
+        Comparte tus Fotos
+      </h1>
+      <p class="font-body text-muted-foreground max-w-md mx-auto">
+        Captura los momentos más especiales de esta celebración
+      </p>
+      <div class="mt-5 flex justify-center">
+        <div class="w-12 h-[2px] bg-[#9ca68c] rounded-full"></div>
+      </div>
+    </div>
+
+    <!-- Tarjeta principal -->
+    <div class="w-full max-w-lg bg-white/60 backdrop-blur-sm rounded-3xl shadow-xl border border-white/80 p-8 space-y-6">
+
+      <!-- Nombre obligatorio -->
+      <div class="relative">
+        <span class="absolute left-4 top-4 text-[#9ca68c] text-lg">👤</span>
+        <input
+          type="text"
+          [(ngModel)]="nombre"
+          #nombreInput="ngModel"
+          required
+          placeholder="Tu nombre (obligatorio)"
+          class="w-full bg-[#faf8f4] border rounded-2xl pl-11 pr-5 py-4 font-body text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 transition-all"
+          [class.border-red-300]="nombreInput.touched && !nombre.trim()"
+          [class.focus:ring-red-200]="nombreInput.touched && !nombre.trim()"
+          [class.border-[#e6e2d9]]="!nombreInput.touched || nombre.trim()"
+          [class.focus:border-[#9ca68c]]="!nombreInput.touched || nombre.trim()"
+          [class.focus:ring-[#9ca68c]/20]="!nombreInput.touched || nombre.trim()"
+        />
+        <p
+          *ngIf="nombreInput.touched && !nombre.trim()"
+          class="mt-1.5 ml-1 text-xs text-red-400 font-body flex items-center gap-1"
+        >
+          <span>⚠</span> Por favor escribe tu nombre
+        </p>
+      </div>
+
+      <!-- Input oculto -->
+      <input
+        #fileInput
+        type="file"
+        multiple
+        accept="image/*,video/*"
+        class="hidden"
+        (change)="onFilesSelected($event)"
+      />
+
+      <!-- Zona Drag & Drop -->
+      <div
+        (click)="fileInput.click()"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave()"
+        (drop)="onDrop($event)"
+        [class.border-[#9ca68c]]="isDragging"
+        [class.bg-[#9ca68c]/10]="isDragging"
+        class="border-2 border-dashed border-[#9ca68c]/40 rounded-2xl p-8 text-center bg-[#faf8f4]/60 hover:bg-[#9ca68c]/5 hover:border-[#9ca68c]/70 transition-all duration-200 cursor-pointer group"
+      >
+        <div class="text-4xl mb-3 group-hover:scale-110 transition-transform duration-200">
+          {{ isDragging ? '📂' : '🖼️' }}
+        </div>
+        <p class="font-body text-foreground font-medium">
+          {{ isDragging ? 'Suelta aquí tus archivos' : 'Toca o arrastra tus fotos y videos' }}
+        </p>
+        <p class="font-body text-xs text-muted-foreground mt-1">
+          JPG · PNG · HEIC · MP4
+        </p>
+      </div>
+
+      <!-- Previews de archivos -->
+      <div *ngIf="filePreviews.length > 0" class="space-y-3">
+        <p class="font-body text-sm text-muted-foreground font-medium">
+          {{ filePreviews.length }} archivo(s) listo(s):
+        </p>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div
+            *ngFor="let fp of filePreviews; let i = index"
+            class="relative group rounded-xl overflow-hidden aspect-square bg-[#f0ece3] shadow-sm"
+          >
+            <!-- Preview imagen -->
+            <img
+              *ngIf="fp.preview && fp.preview !== 'video'"
+              [src]="fp.preview"
+              class="w-full h-full object-cover"
+              [class.opacity-60]="fp.progress === 1"
+            />
+
+            <!-- Preview video -->
+            <div
+              *ngIf="fp.preview === 'video'"
+              class="w-full h-full flex items-center justify-center text-2xl bg-[#e8e4db]"
+            >
+              🎬
+            </div>
+
+            <!-- Subiendo -->
+            <div
+              *ngIf="fp.progress === 1"
+              class="absolute inset-0 bg-black/40 flex items-center justify-center"
+            >
+              <div class="w-7 h-7 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+            </div>
+
+            <!-- Éxito -->
+            <div
+              *ngIf="fp.progress === 2"
+              class="absolute inset-0 bg-green-500/40 flex items-center justify-center"
+            >
+              <span class="text-white text-2xl">✓</span>
+            </div>
+
+            <!-- Error -->
+            <div
+              *ngIf="fp.progress === -1"
+              class="absolute inset-0 bg-red-500/40 flex items-center justify-center"
+            >
+              <span class="text-white text-xl">✕</span>
+            </div>
+
+            <!-- Botón eliminar -->
+            <button
+              *ngIf="fp.progress === 0"
+              (click)="removeFile(i)"
+              class="absolute top-1 right-1 w-6 h-6 bg-black/60 text-white text-xs rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-red-500"
+            >
+              ✕
+            </button>
+
+            <!-- Nombre archivo -->
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-1.5">
+              <p class="text-white text-[9px] truncate leading-tight">{{ fp.file.name }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contador progreso -->
+        <div *ngIf="isUploading" class="flex items-center gap-3 bg-[#9ca68c]/10 rounded-xl px-4 py-3">
+          <div class="w-5 h-5 border-2 border-[#9ca68c]/30 border-t-[#9ca68c] rounded-full animate-spin flex-shrink-0"></div>
+          <p class="font-body text-sm text-[#7a846a]">
+            Subiendo {{ uploadedCount }} de {{ filePreviews.length }} archivos...
+          </p>
+        </div>
+      </div>
+
+      <!-- Botón subir -->
+      <button
+        (click)="uploadFiles()"
+        [disabled]="!canUpload"
+        class="w-full bg-[#9ca68c] hover:bg-[#8e987f] active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed text-white font-body font-medium py-4 rounded-2xl transition-all duration-200 shadow-md tracking-wide flex items-center justify-center gap-3"
+      >
+        <span *ngIf="isUploading" class="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+        <span *ngIf="!isUploading">⬆</span>
+        {{ isUploading ? 'Subiendo...' : 'Subir Archivos' }}
+      </button>
+
+      <!-- Mensaje error -->
+      <div *ngIf="hasError && !isUploading" class="bg-red-50 border border-red-200 rounded-2xl p-4 text-center">
+        <p class="font-body text-sm text-red-600">
+          ⚠️ Algunos archivos no se pudieron subir. Inténtalo de nuevo.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Toast éxito -->
+    <div
+      *ngIf="uploadSuccess"
+      class="mt-6 w-full max-w-lg bg-white/80 backdrop-blur border border-green-200 rounded-2xl p-6 text-center shadow-lg animate-fade-in"
+    >
+      <div class="text-4xl mb-3">💖</div>
+      <h3 class="font-heading text-xl text-green-700 mb-1">
+        ¡Gracias por compartir este momento!
+      </h3>
+      <p class="font-body text-sm text-green-600">
+        Tus recuerdos ya forman parte de nuestra historia.
+      </p>
+    </div>
+
+  </section>
+</div>
